@@ -27,10 +27,22 @@ def dataset(size =  200, timesteps = 25):
 # %%
 class RNN:
     def __init__(self, x, y, hidden_units, lr = 0.01):
-        self.x = x # shape [samples, timesteps, features]
+        self.x = x # shape [samples, timesteps, features = 1 in our case]
+        print(self.x.shape)
+        print(self.x[0])
+        print(self.x[1])
+        print(self.x[2])
+        print(self.x)
         self.y = y # shape [samples, outputs]
+        print(self.y.shape)
+        print(self.y[0])
+        print(self.y[1])
+        print(self.y[2])
+        print(self.y[3])
+        print(self.y)
         self.mode = 'train'
         self.hidden_units = hidden_units
+        print(self.hidden_units)
         self.lr = lr
         self.Wx = np.random.randn(self.hidden_units, self.x.shape[2])
         self.Wh = np.random.randn(self.hidden_units, self.hidden_units)
@@ -95,7 +107,7 @@ y_test = y_test[250:]
 
 #%%
 """ TRAIN """
-model = RNN(x,y,hidden_units=100)
+model = RNN(x,y,hidden_units=1)
 epochs = 100
 
 Ovr_loss = []
