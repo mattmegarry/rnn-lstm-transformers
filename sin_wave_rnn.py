@@ -29,6 +29,7 @@ class RNN:
     def __init__(self, x, y, hidden_units, lr = 0.01):
         self.x = x # shape [samples, timesteps, features]
         self.y = y # shape [samples, outputs]
+        self.mode = 'train'
         self.hidden_units = hidden_units
         self.lr = lr
         self.Wx = np.random.randn(self.hidden_units, self.x.shape[2])
@@ -40,8 +41,12 @@ class RNN:
         yt = np.dot(self.Wy,ht)
         return ht, yt
     
-    def forward(self, sample):
-        sample_x, sample_y = self.x[sample], self.y[sample]
+    def forward(self, sample, test_x = None, test_y = None):
+        if self.mode == 'train':
+            sample_x, sample_y = self.x[sample], self.y[sample]
+        elif self.mode == 'eval':
+            sample_x, sample_y = test_x[sample], test_y[sample]
+        
         ht = np.zeros((self.hidden_units,1)) # first hidden state is zeros vector
         self.hidden_states = [ht] # collection of hidden states for each sample
         self.inputs = [] # collection of inputs for each sample
@@ -53,7 +58,7 @@ class RNN:
         self.error = yt - sample_y
         self.loss = 0.5*self.error**2
         self.yt = yt
-        return self.loss
+        return self.loss, self.yt
 
     def backward(self):
         n = len(self.inputs)
@@ -75,14 +80,12 @@ class RNN:
         self.Wy -= self.lr * dWy
         self.Wx -= self.lr * dWx
         self.Wh -= self.lr * dWh
-    
-    def test(self,x,y):
-        self.x = x
-        self.y = y
-        self.outputs = []
-        for sample in range(len(x)):
-            self.forward(sample)
-            self.outputs.append(self.yt)
+
+    def train_mode(self):
+        self.mode = 'train'
+
+    def eval_mode(self):
+        self.mode = 'eval'   
 
 #%%
 x,y = dataset()
@@ -98,7 +101,7 @@ epochs = 100
 Ovr_loss = []
 for epoch in tqdm(range(epochs)):
     for sample in range(model.x.shape[0]):
-        loss = model.forward(sample)
+        loss, _ = model.forward(sample)
         model.backward()
     Ovr_loss.append(np.squeeze(loss / model.x.shape[0]))
     loss = 0
@@ -107,12 +110,19 @@ plt.plot(Ovr_loss)
 
 #%%
 """ TEST """
-model.test(x_test, y_test)
+model.eval_mode()
+test_outputs = []
+for sample in range(len(x_test)):
+    _, yt = model.forward(sample, x_test, y_test)
+    test_outputs.append(yt)
+model.train_mode()
+
+
 plt.tight_layout()
 plt.figure(dpi=120)
 plt.subplot(121)
 plt.plot(Ovr_loss)
 plt.subplot(122)
-plt.plot([i for i in range(len(x_test))],y_test,np.array(model.outputs).reshape(y_test.shape))
+plt.plot([i for i in range(len(x_test))],y_test,np.array(test_outputs).reshape(y_test.shape))
 
 #%%
