@@ -44,9 +44,13 @@ class RNN:
         self.hidden_units = hidden_units
         print(self.hidden_units)
         self.lr = lr
+        print(self.x.shape[2])
         self.Wx = np.random.randn(self.hidden_units, self.x.shape[2])
+        print(self.Wx.shape)
         self.Wh = np.random.randn(self.hidden_units, self.hidden_units)
+        print(self.Wh.shape)
         self.Wy = np.random.randn(self.y.shape[1],self.hidden_units)
+        print(self.Wy.shape)
 
     def cell(self, xt, ht_1):
         ht = np.tanh(np.dot(self.Wx,xt.reshape(1,1)) + np.dot(self.Wh,ht_1))
@@ -107,7 +111,7 @@ y_test = y_test[250:]
 
 #%%
 """ TRAIN """
-model = RNN(x,y,hidden_units=1)
+model = RNN(x,y,hidden_units=4)
 epochs = 100
 
 Ovr_loss = []
