@@ -107,18 +107,18 @@ class SingleHeadSelfAttention(nn.Module):
 #%%
 
 attention = SingleHeadSelfAttention(embed_size)
-
-for word in words[:1]:
-    char_ids = [stoi[c] for c in word]
-    sequence_pos_embeddings = []
-    for i in range(len(char_ids)):
-        sequence_pos_embeddings.append(torch.tensor(pos_encoded_embeddings[char_ids[i]], dtype=torch.float32))
-        print(itos[char_ids[i]])
-        # TO DO: EOS token
-    print("\n")
-    sequence_pos_embeddings = tuple(sequence_pos_embeddings)
-    sequence_input = torch.cat(sequence_pos_embeddings, dim=0).reshape(len(char_ids), embed_size)
-    attention(sequence_input, sequence_input, sequence_input)
+for epoch in range(10):
+    for word in words:
+        char_ids = [stoi[c] for c in word]
+        sequence_pos_embeddings = []
+        for i in range(len(char_ids)):
+            sequence_pos_embeddings.append(torch.tensor(pos_encoded_embeddings[char_ids[i]], dtype=torch.float32))
+            print(itos[char_ids[i]])
+            # TO DO: EOS token
+        print("\n")
+        sequence_pos_embeddings = tuple(sequence_pos_embeddings)
+        sequence_input = torch.cat(sequence_pos_embeddings, dim=0).reshape(len(char_ids), embed_size)
+        attention(sequence_input, sequence_input, sequence_input)
     
         
 # %%

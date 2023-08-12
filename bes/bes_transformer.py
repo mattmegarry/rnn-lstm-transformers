@@ -1,19 +1,21 @@
+#%%
 import random
 import torch
 import math
-
+import matplotlib.pyplot as plt
+from vis_utils import plot_attention_heatmap, plot_output_heatmap
 
 torch.manual_seed(42)
-
+max_seq_len = 26
 
 class Tokenizer:
   def __init__(self):
-    f = open('/root/tiny-transformer/names.txt', 'r')
+    f = open('names.txt', 'r')
     names = f.read().splitlines()
-    vocab = ['<pad>', '<eos>', '<sos>'] + sorted(set(''.join(names)))
-    self.stoi = {c:i for i, c in enumerate(vocab)}
-    self.itos = {i:c for i, c in enumerate(vocab)}
-    self.vocab_size = len(vocab)
+    self.vocab = ['<pad>', '<eos>', '<sos>'] + sorted(set(''.join(names)))
+    self.stoi = {c:i for i, c in enumerate(self.vocab)}
+    self.itos = {i:c for i, c in enumerate(self.vocab)}
+    self.vocab_size = len(self.vocab)
     f.close()
 
   def encode(self, name):
@@ -21,6 +23,9 @@ class Tokenizer:
 
   def decode(self, tokens):
     return ''.join([self.itos[t] for t in tokens])
+  
+  def get_vocab(self):
+    return self.vocab
 
 
 tokenizer = Tokenizer()
@@ -31,7 +36,7 @@ bar = tokenizer.decode(foo)    # john
 
 class Dataset(torch.utils.data.Dataset):
   def __init__(self):
-    f = open('/root/tiny-transformer/names.txt', 'r')
+    f = open('names.txt', 'r')
     self.names = f.read().split('\n')
     self.tokenizer = Tokenizer()
     f.close()
@@ -55,7 +60,7 @@ class BesSimpleTransformer(torch.nn.Module):
     self.embedding    = torch.nn.Embedding(29, 7)
     self.pos_emb      = self.get_pos_matrix()
     # Mask tensor trick
-    self.register_buffer('mask', torch.tril(torch.ones(19, 19)))
+    self.register_buffer('mask', torch.tril(torch.ones(max_seq_len, max_seq_len)))
     # First decoder block
     self.layer_00_key = torch.nn.Linear(7, 11)
     self.layer_00_qry = torch.nn.Linear(7, 11)
@@ -70,9 +75,16 @@ class BesSimpleTransformer(torch.nn.Module):
     self.map_to_vocab = torch.nn.Linear(7, 29)
 
   def forward(self, x):
+    #print(x)
     emb = self.embedding(x)
+    """ print(emb)
+    print(emb.shape)
+    plot_attention_heatmap(emb) """
     pos = self.pos_emb[0:x.shape[0], :]
     emb = emb + pos
+    """ print(emb)
+    print(emb.shape)
+    plot_attention_heatmap(emb) """
 
     key = self.layer_00_key(emb)
     qry = self.layer_00_qry(emb)
@@ -93,13 +105,15 @@ class BesSimpleTransformer(torch.nn.Module):
     att = torch.nn.functional.softmax(att, dim=1)
     res = torch.mm(att, val)
     res = self.layer_01_ffw(res)
+    """ plot_attention_heatmap(res) """
 
     out = self.map_to_vocab(res)
-    return out
+    """ plot_attention_heatmap(res) """
+    return out, att
 
   def get_pos_matrix(self):
-    store = torch.zeros(19, 7)
-    for pos in range(19):
+    store = torch.zeros(max_seq_len, 7)
+    for pos in range(max_seq_len):
       for i in range(0, 7, 2):
         denominator = 10000 ** (2 * i / 7)
         store[pos, i] = math.sin(pos / denominator)
@@ -110,7 +124,7 @@ class BesSimpleTransformer(torch.nn.Module):
 m = BesSimpleTransformer()
 opt = torch.optim.SGD(m.parameters(), lr=0.01)
 
-
+#%%
 for epoch in range(10):
   for idx, batch in enumerate(dl):
 
@@ -121,9 +135,13 @@ for epoch in range(10):
     x = torch.cat([sos, x])
     y = torch.cat([x[1:], eos])
 
-    p = m(x)
+    p, attn = m(x)
+    if idx % 1000 == 0:
+      vocab = tokenizer.get_vocab()
+      intermediate_output, _ = m(torch.tensor(tokenizer.encode(''.join(vocab[3:]))))
+      plot_output_heatmap(intermediate_output, reference=vocab, candidate=vocab)
     l = torch.nn.functional.cross_entropy(p, y)
-    if idx % 1000 == 0: print("Loss:", l.item())
+    # if idx % 1000 == 0: print("Loss:", l.item())
     l.backward()
     opt.step()
     opt.zero_grad()
@@ -131,9 +149,24 @@ for epoch in range(10):
   x = tokenizer.decode([random.randint(3, 25)])
   x = torch.cat([sos, torch.tensor(tokenizer.encode([x]))])
   while True:
-    p = m(x)
+    p, _ = m(x)
     p = torch.nn.functional.softmax(p, dim=1)
     p = torch.argmax(p, dim=1)
     x = torch.cat([x, p[-1].unsqueeze(0)])
     if p[-1] == 1 or len(p.tolist()) == 17: break
-  print("Generate:", tokenizer.decode(x.tolist()))
+  #print("Generate:", tokenizer.decode(x.tolist()))
+
+# %%
+x = tokenizer.decode([random.randint(3, 25)])
+print(x)
+x = torch.cat([sos, torch.tensor(tokenizer.encode([x]))])
+print(x)
+p, attn = m(x)
+plot_attention_heatmap(p)
+plot_attention_heatmap(attn)
+
+
+
+# %%
+print(''.join(vocab[3:]))
+# %%
