@@ -75,6 +75,7 @@ class BesSimpleTransformer(torch.nn.Module):
     self.map_to_vocab = torch.nn.Linear(7, 29)
 
   def forward(self, x):
+    plot_attention_heatmap(self.embedding(torch.tensor([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29])))
     #print(x)
     emb = self.embedding(x)
     """ print(emb)
@@ -137,9 +138,9 @@ for epoch in range(10):
 
     p, attn = m(x)
     if idx % 1000 == 0:
-      vocab = tokenizer.get_vocab()
+      """ vocab = tokenizer.get_vocab()
       intermediate_output, _ = m(torch.tensor(tokenizer.encode(''.join(vocab[3:]))))
-      plot_output_heatmap(intermediate_output, reference=vocab, candidate=vocab)
+      plot_output_heatmap(intermediate_output, reference=vocab, candidate=vocab) """
     l = torch.nn.functional.cross_entropy(p, y)
     # if idx % 1000 == 0: print("Loss:", l.item())
     l.backward()
