@@ -3,7 +3,10 @@ import random
 import torch
 import math
 import matplotlib.pyplot as plt
+from copy import deepcopy
+
 from vis_utils import plot_attention_heatmap, plot_output_heatmap
+from utils import instance_vars_identical
 
 torch.manual_seed(42)
 max_seq_len = 26
@@ -75,7 +78,8 @@ class BesSimpleTransformer(torch.nn.Module):
     self.map_to_vocab = torch.nn.Linear(7, 29)
 
   def forward(self, x):
-    plot_attention_heatmap(self.embedding(torch.tensor([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29])))
+    
+    # plot_attention_heatmap(self.embedding(torch.tensor([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28])))
     #print(x)
     emb = self.embedding(x)
     """ print(emb)
