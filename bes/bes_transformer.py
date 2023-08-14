@@ -61,6 +61,7 @@ class BesSimpleTransformer(torch.nn.Module):
     super(BesSimpleTransformer, self).__init__()
     # Embedding part of the model
     self.embedding    = torch.nn.Embedding(29, 7)
+    self.embedding_initial = deepcopy(self.embedding)
     self.pos_emb      = self.get_pos_matrix()
     # Mask tensor trick
     self.register_buffer('mask', torch.tril(torch.ones(max_seq_len, max_seq_len)))
@@ -81,7 +82,11 @@ class BesSimpleTransformer(torch.nn.Module):
     
     # plot_attention_heatmap(self.embedding(torch.tensor([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28])))
     #print(x)
+    #plot_attention_heatmap(self.embedding.weight)
+    #print(self.embedding.__dict__)
+    #print(self.embedding_initial.weight - self.embedding.weight)
     emb = self.embedding(x)
+    print(emb)
     """ print(emb)
     print(emb.shape)
     plot_attention_heatmap(emb) """
@@ -138,7 +143,9 @@ for epoch in range(10):
 
     x = batch[0]
     x = torch.cat([sos, x])
+    print(x)
     y = torch.cat([x[1:], eos])
+    print(y)
 
     p, attn = m(x)
     if idx % 1000 == 0:
