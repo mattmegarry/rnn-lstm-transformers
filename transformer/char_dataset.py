@@ -5,7 +5,7 @@ class CharDataset(torch.utils.data.Dataset):
   def __init__(self):
     f = open('names.txt', 'r')
     self.names = f.read().split('\n')
-    self.tokenizer = CharTokenizer(self.names)
+    self.tokenizer = CharTokenizer()
     f.close()
 
   def __len__(self):

@@ -1,6 +1,8 @@
 class CharTokenizer:
-  def __init__(self, words):
-    self.vocab = ['<pad>', '<eos>', '<sos>'] + sorted(set(''.join(words)))
+  def __init__(self):
+    f = open('names.txt', 'r')
+    names = f.read().splitlines()
+    self.vocab = ['<pad>', '<eos>', '<sos>'] + sorted(set(''.join(names)))
     self.stoi = {c:i for i, c in enumerate(self.vocab)}
     self.itos = {i:c for i, c in enumerate(self.vocab)}
     self.vocab_size = len(self.vocab)
@@ -17,8 +19,7 @@ class CharTokenizer:
 
 # Just for testing...
 """
-names = ['john', 'jane', 'doe']
-tokenizer = CharTokenizer(names)
+tokenizer = CharTokenizer()
 print(tokenizer.vocab_size) 
 encoded = tokenizer.encode('john')
 decoded = tokenizer.decode(encoded)
