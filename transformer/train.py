@@ -4,14 +4,15 @@ import torch
 import math
 import matplotlib.pyplot as plt
 
-from char_dataset import CharDataset
+from sentencepeice_tokenizer import SentencePieceTokenizer
 from model import DecoderModel
 
 torch.manual_seed(42)
 max_seq_len = 26
 epochs = 10
 
-dataset = CharDataset()
+tokenizer = SentencePieceTokenizer()
+dataset = TinyStoriesDataset(tokenizer)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
 model = DecoderModel(max_seq_len, 29, 7)
 optimizer = torch.optim.SGD(model.parameters(), lr=0.01)

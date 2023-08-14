@@ -1,11 +1,10 @@
 import sentencepiece as spm
 
-# NB: this was run in google collab to produce the model file and vocab file - its not perfect. May be wise to go again with better parameters
 # There is also a more pytorch way of doing this. 
 
 # train sentencepiece model from `botchan.txt` and makes `m.model` and `m.vocab`
 # `m.vocab` is just a reference. not used in the segmentation.
-spm.SentencePieceTrainer.train('--input=TinyStories-train.txt --model_prefix=m --vocab_size=2000')
+spm.SentencePieceTrainer.train('--input=TinyStories-10k.txt --model_prefix=m --vocab_size=2000')
 
 # makes segmenter instance and loads the model file (m.model)
 sp = spm.SentencePieceProcessor()
