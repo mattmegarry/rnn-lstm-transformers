@@ -14,6 +14,7 @@ class SentencePieceTokenizer:
         return self.sp_model.GetPieceSize()
 
 # Just for testing...
+"""
 tokenizer = SentencePieceTokenizer()
 sentence = "Hello, my name is John."
 encoded = tokenizer.encode(sentence)
@@ -21,3 +22,4 @@ decoded = tokenizer.decode(encoded)
 print(encoded)
 print(decoded)  
 print(tokenizer.get_vocab())
+"""
