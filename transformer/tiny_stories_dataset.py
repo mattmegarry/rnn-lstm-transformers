@@ -12,4 +12,4 @@ class TinyStoriesDataset(torch.utils.data.Dataset):
 
   def __getitem__(self, idx):
     story_line = self.story_lines[idx]
-    return torch.tensor(self.tokenizer.encode_as_ids(story_line))
+    return torch.tensor(self.tokenizer.encode(story_line))
