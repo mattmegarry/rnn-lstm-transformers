@@ -13,7 +13,7 @@ epochs = 100
 tokenizer = SentencePieceTokenizer()
 dataset = TinyStoriesDataset(tokenizer)
 vocab_len = tokenizer.get_vocab_size()
-dataloader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=False)
+dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True)
 model = DecoderModel(max_seq_len, vocab_len, 32)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
@@ -25,9 +25,6 @@ for epoch in range(epochs):
     eos = torch.tensor([2])
 
     x = batch[0]
-
-    # Hack to make it work with the current dataset
-    if x.numel() == 0: break
 
     x = torch.cat([sos, x])
     y = torch.cat([x[1:], eos])
