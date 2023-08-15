@@ -1,10 +1,17 @@
 import torch
+from torch.nn.utils.rnn import pad_sequence
+
+torch.manual_seed(42)
+
+def pad(sequences, batch_first=True, padding_value=0.0):
+    return pad_sequence(sequences, batch_first=batch_first, padding_value=padding_value)
 
 class TinyStoriesDataset(torch.utils.data.Dataset):
   def __init__(self, tokenizer):
-    f = open('TinyStories-10k.txt', 'r')
+    f = open('TinyStories-2048.txt', 'r')
     self.story_lines = f.read().split('\n')
     self.tokenizer = tokenizer
+    print("Number of stories: ", len(self.story_lines))
     f.close()
 
   def __len__(self):
