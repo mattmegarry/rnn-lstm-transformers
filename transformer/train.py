@@ -16,7 +16,7 @@ tokenizer = SentencePieceTokenizer()
 dataset = TinyStoriesDataset(tokenizer)
 vocab_len = tokenizer.get_vocab_size()
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
-model = DecoderModel(max_seq_len, vocab_len, 128)
+model = DecoderModel(max_seq_len, vocab_len, 32)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 for epoch in range(epochs):
