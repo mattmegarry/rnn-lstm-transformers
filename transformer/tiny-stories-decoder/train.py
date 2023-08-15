@@ -55,7 +55,6 @@ def generate_from_string(string):
 
 generate_from_string("The man")
 generate_from_string("The woman")
-generate_from_string("I like")
 generate_from_string("In the beginning")
 generate_from_string("Once upon a time")
 # %%
