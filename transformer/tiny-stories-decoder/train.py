@@ -23,27 +23,16 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 for epoch in range(epochs):
   print("Epoch:", epoch)
   for idx, batch in enumerate(dataloader):
-    """ if epoch == 1:
-      print(idx)
-      print(batch.shape)
-      x = batch[idx]
-      print(tokenizer.decode(x.tolist())) """
-    #if idx == batch_size: break
     sos = torch.tensor([1])
     eos = torch.tensor([2])
 
     x = batch
     y = batch
 
-    print("y:")
-    print(y.shape)
-
     """ x = torch.cat([sos, x])
     y = torch.cat([x[1:], eos]) """
 
     probabilities = model(x)
-    print("probabilities:")
-    print(probabilities.shape)
     loss = torch.nn.functional.cross_entropy(probabilities.view(-1, 2000), y.view(-1))
     if idx % 1000 == 0: 
       print("Loss:", loss.item())

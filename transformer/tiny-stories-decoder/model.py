@@ -18,8 +18,6 @@ class DecoderModel(torch.nn.Module):
     self.map_to_vocab = torch.nn.Linear(self.embedding_dimensions, self.vocab_len)
 
   def forward(self, x):
-    print(x.shape)
-    print(x.dim())
     emb = self.embedding(x)
     pos = self.pos_emb[0:x.shape[1], :]
     emb = emb + pos
@@ -56,13 +54,10 @@ class SelfAttention(torch.nn.Module):
 
         k_transpose = key.permute(0,2,1)
         att = torch.bmm(qry, k_transpose)
-        print(x.shape[1])
         msk = self.mask[0:x.shape[1], 0:x.shape[1]]
-        print(msk.shape)
         batch_msk = msk.unsqueeze(0).expand(att.size())
         att = att.masked_fill(batch_msk == 0, float('-inf'))
         att = torch.nn.functional.softmax(att, dim=1)
         res = torch.bmm(att, val)
-        print(res.shape)
         res = self.feed_forward(res)
         return res
