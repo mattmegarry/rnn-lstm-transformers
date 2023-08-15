@@ -1,7 +1,5 @@
 #%%
-import random
 import torch
-import math
 import matplotlib.pyplot as plt
 
 from sentencepeice_tokenizer import SentencePieceTokenizer
@@ -10,12 +8,12 @@ from model import DecoderModel
 
 torch.manual_seed(42)
 max_seq_len = 2000
-epochs = 1
+epochs = 100
 
 tokenizer = SentencePieceTokenizer()
 dataset = TinyStoriesDataset(tokenizer)
 vocab_len = tokenizer.get_vocab_size()
-dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
+dataloader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=False)
 model = DecoderModel(max_seq_len, vocab_len, 32)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
