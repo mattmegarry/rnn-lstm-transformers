@@ -27,6 +27,8 @@ for epoch in range(epochs):
     eos = torch.full((batch_size, 1), 2)
 
     x = batch
+    print(x.shape)
+    print(sos.shape)
     x = torch.cat([sos, x], dim=1)
     y = torch.cat([x[:, 1:], eos], dim=1)
 
