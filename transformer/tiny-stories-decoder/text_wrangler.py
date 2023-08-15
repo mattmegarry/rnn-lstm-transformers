@@ -1,12 +1,14 @@
 import re
 import os
 
-num_stories = 2048
+num_stories = 10000
 count = 0
+training_filename = 'TinyStories-' + str(num_stories) + '.txt'
 
 def transmute_stories(num_stories=num_stories, count=count):
-    os.remove('TinyStories-2048.txt')
-    with open('TinyStories-train.txt') as source, open('TinyStories-2048.txt', 'a') as target:
+    if os.path.exists(training_filename):
+        os.remove(training_filename)
+    with open('TinyStories-train.txt') as source, open(training_filename, 'a') as train_data:
         line_accumulator = ""
         for line in source:
             if num_stories <= count:
@@ -16,14 +18,17 @@ def transmute_stories(num_stories=num_stories, count=count):
                 line_accumulator += line    
             else:
                 line_accumulator = line_accumulator.strip()
-                print(line_accumulator, file=target, end='\n')
+                if count == num_stories - 1:
+                    print(line_accumulator, file=train_data, end='')
+                else:
+                    print(line_accumulator, file=train_data, end='\n')
                 line_accumulator = ""
                 count += 1
 
 transmute_stories(num_stories, count)
 
-target_check = 0
-with open('TinyStories-2048.txt') as target:
-    for line in target:
-        target_check += 1
-print("Stories written: ", target_check)       
+train_data_check = 0
+with open(training_filename) as train_data:
+    for line in train_data:
+        train_data_check += 1
+print("Stories written: ", train_data_check)       
