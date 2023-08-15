@@ -30,12 +30,12 @@ class DecoderModel(torch.nn.Module):
     return out
 
   def get_pos_matrix(self):
-    store = torch.zeros(self.max_seq_len, 7)
+    store = torch.zeros(self.max_seq_len, self.embedding_dimensions)
     for pos in range(self.max_seq_len):
-      for i in range(0, 7, 2):
-        denominator = 10000 ** (2 * i / 7)
+      for i in range(0, self.embedding_dimensions, 2):
+        denominator = 10000 ** (2 * i / self.embedding_dimensions)
         store[pos, i] = math.sin(pos / denominator)
-        if i + 1 < 7: store[pos, i + 1] = math.cos(pos / denominator)
+        if i + 1 < self.embedding_dimensions: store[pos, i + 1] = math.cos(pos / denominator)
     return store
   
 class SelfAttention(torch.nn.Module):

@@ -1,15 +1,15 @@
 import torch
 
-class CharDataset(torch.utils.data.Dataset):
+class TinyStoriesDataset(torch.utils.data.Dataset):
   def __init__(self, tokenizer):
-    f = open('TinyStories-train.txt', 'r')
-    self.stories = f.read().split('\n')
+    f = open('TinyStories-10k.txt', 'r')
+    self.story_lines = f.read().split('\n')
     self.tokenizer = tokenizer
     f.close()
 
   def __len__(self):
-    return len(self.names)
+    return len(self.story_lines)
 
   def __getitem__(self, idx):
-    name = self.names[idx]
-    return torch.tensor(self.tokenizer.encode(name))
+    story_line = self.story_lines[idx]
+    return torch.tensor(self.tokenizer.encode_as_ids(story_line))

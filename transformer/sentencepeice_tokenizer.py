@@ -7,10 +7,13 @@ class SentencePieceTokenizer:
     def encode(self, text):
         return self.sp_model.EncodeAsPieces(text)
     
+    def encode_as_ids(self, text):
+        return self.sp_model.EncodeAsIds(text)
+    
     def decode(self, tokens):
         return self.sp_model.DecodePieces(tokens)
     
-    def get_vocab(self):
+    def get_vocab_size(self):
         return self.sp_model.GetPieceSize()
 
 # Just for testing...
