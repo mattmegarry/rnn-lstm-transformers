@@ -7,14 +7,15 @@ from tiny_stories_dataset import TinyStoriesDataset, pad
 from model import DecoderModel
 
 torch.manual_seed(42)
-max_seq_len = 2000
+max_seq_len = 2200
 epochs = 100
 
 tokenizer = SentencePieceTokenizer()
 dataset = TinyStoriesDataset(tokenizer)
 vocab_len = tokenizer.get_vocab_size()
+batch_size = 32
 
-dataloader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=pad)
+dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, collate_fn=pad)
 
 model = DecoderModel(max_seq_len, vocab_len, 32)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -22,17 +23,28 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 for epoch in range(epochs):
   print("Epoch:", epoch)
   for idx, batch in enumerate(dataloader):
-
+    """ if epoch == 1:
+      print(idx)
+      print(batch.shape)
+      x = batch[idx]
+      print(tokenizer.decode(x.tolist())) """
+    #if idx == batch_size: break
     sos = torch.tensor([1])
     eos = torch.tensor([2])
 
-    x = batch[0]
+    x = batch
+    y = batch
 
-    x = torch.cat([sos, x])
-    y = torch.cat([x[1:], eos])
+    print("y:")
+    print(y.shape)
+
+    """ x = torch.cat([sos, x])
+    y = torch.cat([x[1:], eos]) """
 
     probabilities = model(x)
-    loss = torch.nn.functional.cross_entropy(probabilities, y)
+    print("probabilities:")
+    print(probabilities.shape)
+    loss = torch.nn.functional.cross_entropy(probabilities.view(-1, 2000), y.view(-1))
     if idx % 1000 == 0: 
       print("Loss:", loss.item())
     loss.backward()
