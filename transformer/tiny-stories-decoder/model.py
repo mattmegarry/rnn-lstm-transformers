@@ -27,14 +27,15 @@ class DecoderModel(torch.nn.Module):
   def forward(self, x):
     emb = self.embedding(x)
     pos = self.pos_emb[0:x.shape[1], :]
-    pos_emb = emb + pos
+    pos_emb_x = emb + pos
 
-    res = self.attn_one(pos_emb, x=x)
-    res = self.attn_one_add_and_norm(pos_emb, res)
-    attn_one_output = self.feed_forward(res)
-    res = self.attn_two(attn_one_output, x=x)
-    res = self.attn_one_add_and_norm(attn_one_output, res)
-    res = self.feed_forward(res)
+    attn_one = self.attn_one(pos_emb_x, x=x)
+    attn_one_add_norm = self.attn_one_add_and_norm(attn_one, pos_emb_x)
+    attn_one_ff = self.feed_forward(attn_one_add_norm)
+
+    attn_two = self.attn_two(attn_one_ff, x=x)
+    attn_two_add_norm = self.attn_one_add_and_norm(attn_two, attn_one_ff)
+    res = self.feed_forward(attn_two_add_norm)
 
     out = self.map_to_vocab(res)
 
@@ -84,8 +85,8 @@ class AddAndNorm(torch.nn.Module):
         super(AddAndNorm, self).__init__()
         self.layer_norm = torch.nn.LayerNorm(embedding_dimensions)
 
-    def forward(self, residual_x, sublayer_output):
-        return self.layer_norm(residual_x + sublayer_output)
+    def forward(self, sublayer_output, residual_x):
+        return self.layer_norm(sublayer_output + residual_x)
     
 
    

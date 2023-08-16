@@ -34,6 +34,7 @@ dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle
 model = DecoderModel(max_seq_len, vocab_len, 32)
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
+#%%
 for epoch in range(epochs):
   print("Epoch:", epoch)
   for idx, batch in enumerate(dataloader):
