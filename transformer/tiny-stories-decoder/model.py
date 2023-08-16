@@ -29,10 +29,10 @@ class DecoderModel(torch.nn.Module):
     pos = self.pos_emb[0:x.shape[1], :]
     pos_emb = emb + pos
 
-    res = self.attn_one(x, pos_emb)
+    res = self.attn_one(pos_emb, x=x)
     res = self.attn_one_add_and_norm(pos_emb, res)
     attn_one_output = self.feed_forward(res)
-    res = self.attn_two(x, attn_one_output)
+    res = self.attn_two(attn_one_output, x=x)
     res = self.attn_one_add_and_norm(attn_one_output, res)
     res = self.feed_forward(res)
 
@@ -57,7 +57,7 @@ class SelfAttention(torch.nn.Module):
         self.qry = torch.nn.Linear(embedding_dimensions, 32)
         self.val = torch.nn.Linear(embedding_dimensions, 32)
 
-    def forward(self, x, x_embeddings):
+    def forward(self, x_embeddings, x):
         key = self.key(x_embeddings)
         qry = self.qry(x_embeddings)
         val = self.val(x_embeddings)

@@ -84,4 +84,4 @@ generate_from_string("Once upon a time")
     
 self.residual_dropout = torch.nn.Dropout(0.2) """
 
-# TO DO - what is the 11?
+# TO DO - what is the 11? ...now the 32! Its batch size - but should it be?
