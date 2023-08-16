@@ -71,18 +71,3 @@ generate_from_string("The man")
 generate_from_string("The woman")
 generate_from_string("In the beginning")
 generate_from_string("Once upon a time")
-# %%
-"""
-100 Epochs
-Generate: The man said, "I know, "I know".
-Generate: The woman smiled and said, "I know," said.
-Generate: In the beginningedde.
-Generate: Once upon a time there was a time there was a time there was a time
-
-1 Epoch
-Generate: The man...............
-Generate: The woman...............
-Generate: In the beginning..........
-Generate: Once upon a time............
-
-"""
