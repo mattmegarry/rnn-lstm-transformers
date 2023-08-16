@@ -12,16 +12,11 @@ class DecoderModel(torch.nn.Module):
     self.embedding    = torch.nn.Embedding(self.vocab_len, self.embedding_dimensions)
     self.pos_emb      = self.get_pos_matrix()
 
-    self.attn_one = SelfAttention(self.max_seq_len, self.embedding_dimensions)
-    self.attn_one_add_and_norm = AddAndNorm(self.embedding_dimensions)
-    
-    self.attn_two = SelfAttention(self.max_seq_len, self.embedding_dimensions)
-    self.attn_one_add_and_norm = AddAndNorm(self.embedding_dimensions)
-    
-    self.feed_forward = FeedForward(self.embedding_dimensions)
-    self.feed_forward_add_and_norm = AddAndNorm(self.embedding_dimensions)
-    
+    self.add_and_norm = AddAndNorm(self.embedding_dimensions)
 
+    self.attn_one = SelfAttention(self.max_seq_len, self.embedding_dimensions)
+    self.attn_two = SelfAttention(self.max_seq_len, self.embedding_dimensions)
+    self.feed_forward = FeedForward(self.embedding_dimensions)
     self.map_to_vocab = torch.nn.Linear(self.embedding_dimensions, self.vocab_len)
 
   def forward(self, x):
@@ -30,13 +25,12 @@ class DecoderModel(torch.nn.Module):
     pos_emb_x = emb + pos
 
     attn_one = self.attn_one(pos_emb_x, x=x)
-    attn_one_add_norm = self.attn_one_add_and_norm(attn_one, pos_emb_x)
-    attn_one_ff = self.feed_forward(attn_one_add_norm)
+    attn_one_add_norm = self.add_and_norm(attn_one, pos_emb_x)
 
-    attn_two = self.attn_two(attn_one_ff, x=x)
-    attn_two_add_norm = self.attn_one_add_and_norm(attn_two, attn_one_ff)
+    attn_two = self.attn_two(attn_one_add_norm, x=x)
+    attn_two_add_norm = self.add_and_norm(attn_two, attn_one_add_norm)
+    
     res = self.feed_forward(attn_two_add_norm)
-
     out = self.map_to_vocab(res)
 
     return out
@@ -54,9 +48,9 @@ class SelfAttention(torch.nn.Module):
     def __init__(self, max_seq_len, embedding_dimensions):
         super(SelfAttention, self).__init__()
         self.register_buffer('mask', torch.tril(torch.ones(max_seq_len, max_seq_len)))
-        self.key = torch.nn.Linear(embedding_dimensions, 32)
-        self.qry = torch.nn.Linear(embedding_dimensions, 32)
-        self.val = torch.nn.Linear(embedding_dimensions, 32)
+        self.key = torch.nn.Linear(embedding_dimensions, embedding_dimensions)
+        self.qry = torch.nn.Linear(embedding_dimensions, embedding_dimensions)
+        self.val = torch.nn.Linear(embedding_dimensions, embedding_dimensions)
 
     def forward(self, x_embeddings, x):
         key = self.key(x_embeddings)
@@ -71,14 +65,6 @@ class SelfAttention(torch.nn.Module):
         att = torch.nn.functional.softmax(att, dim=1)
         res = torch.bmm(att, val)
         return res
-    
-class FeedForward(torch.nn.Module):
-   def __init__(self, embedding_dimensions):
-      super(FeedForward, self).__init__()
-      self.feed_forward = torch.nn.Linear(32, embedding_dimensions)
-
-   def forward(self, x):
-      return self.feed_forward(x)
    
 class AddAndNorm(torch.nn.Module):
     def __init__(self, embedding_dimensions):
@@ -87,6 +73,14 @@ class AddAndNorm(torch.nn.Module):
 
     def forward(self, sublayer_output, residual_x):
         return self.layer_norm(sublayer_output + residual_x)
+    
+class FeedForward(torch.nn.Module):
+   def __init__(self, embedding_dimensions):
+      super(FeedForward, self).__init__()
+      self.feed_forward = torch.nn.Linear(embedding_dimensions, embedding_dimensions)
+
+   def forward(self, x):
+      return self.feed_forward(x)
     
 
    
