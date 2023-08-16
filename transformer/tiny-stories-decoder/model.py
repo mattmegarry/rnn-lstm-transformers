@@ -78,9 +78,13 @@ class FeedForward(torch.nn.Module):
    def __init__(self, embedding_dimensions):
       super(FeedForward, self).__init__()
       self.feed_forward = torch.nn.Linear(embedding_dimensions, embedding_dimensions)
+      self.relu = torch.nn.ReLU()
 
    def forward(self, x):
-      return self.feed_forward(x)
+      x = self.feed_forward(x)
+      x = self.relu(x)
+      x = self.feed_forward(x)
+      return x
     
 
    

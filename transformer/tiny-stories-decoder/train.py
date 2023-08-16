@@ -56,6 +56,7 @@ for epoch in range(epochs):
 wandb.finish()
 
 #%%
+max_seq_len = 20
 def generate_from_string(string):
       sos = torch.full((1, 1), 1)
       x = torch.cat([sos, torch.tensor([tokenizer.encode(string)])], dim=1)
@@ -73,6 +74,7 @@ generate_from_string("The man")
 generate_from_string("The woman")
 generate_from_string("In the beginning")
 generate_from_string("Once upon a time")
+generate_from_string("Once upon a time, there was a")
 
 
 """ class AddAndNorm(torch.nn.Module):
@@ -86,3 +88,4 @@ generate_from_string("Once upon a time")
 self.residual_dropout = torch.nn.Dropout(0.2) """
 
 # TO DO - what is the 11? ...now the 32! Its batch size - but should it be?
+# %%

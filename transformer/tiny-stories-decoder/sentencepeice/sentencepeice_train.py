@@ -4,11 +4,11 @@ import sentencepiece as spm
 
 # train sentencepiece model from `botchan.txt` and makes `m.model` and `m.vocab`
 # `m.vocab` is just a reference. not used in the segmentation.
-spm.SentencePieceTrainer.train('--input=TinyStories-10k.txt --model_prefix=m --vocab_size=2000')
+spm.SentencePieceTrainer.train('--input=../data/TinyStories-train.txt --model_prefix=vocab9866 --vocab_size=9866 --input_sentence_size=60000 --shuffle_input_sentence=true')
 
 # makes segmenter instance and loads the model file (m.model)
 sp = spm.SentencePieceProcessor()
-sp.load('m.model')
+sp.load('vocab9866.model')
 
 # encode: text => id
 print(sp.encode_as_pieces('This is a test'))

@@ -2,5 +2,7 @@ env/
 __pycache__/
 m.model
 m.vocab
+vocab9866.model
+vocab9866.vocab
 TinyStories-train.txt
 wandb/
