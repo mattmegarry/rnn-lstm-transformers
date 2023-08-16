@@ -52,6 +52,7 @@ for epoch in range(epochs):
     loss.backward()
     optimizer.step()
     optimizer.zero_grad()
+wandb.finish()
 
 #%%
 def generate_from_string(string):
