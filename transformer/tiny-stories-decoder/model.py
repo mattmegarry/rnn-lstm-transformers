@@ -14,6 +14,7 @@ class DecoderModel(torch.nn.Module):
 
     self.attn_one = SelfAttention(self.max_seq_len, self.embedding_dimensions)
     self.attn_two = SelfAttention(self.max_seq_len, self.embedding_dimensions)
+    self.feed_forward = FeedForward(self.embedding_dimensions)
 
     self.map_to_vocab = torch.nn.Linear(self.embedding_dimensions, self.vocab_len)
 
@@ -23,7 +24,9 @@ class DecoderModel(torch.nn.Module):
     emb = emb + pos
 
     res = self.attn_one(x, emb)
+    res = self.feed_forward(res)
     res = self.attn_two(x, res)
+    res = self.feed_forward(res)
 
     out = self.map_to_vocab(res)
 
@@ -45,7 +48,6 @@ class SelfAttention(torch.nn.Module):
         self.key = torch.nn.Linear(embedding_dimensions, 11)
         self.qry = torch.nn.Linear(embedding_dimensions, 11)
         self.val = torch.nn.Linear(embedding_dimensions, 11)
-        self.feed_forward = torch.nn.Linear(11, embedding_dimensions)
 
     def forward(self, x, x_embeddings):
         key = self.key(x_embeddings)
@@ -59,5 +61,15 @@ class SelfAttention(torch.nn.Module):
         att = att.masked_fill(batch_msk == 0, float('-inf'))
         att = torch.nn.functional.softmax(att, dim=1)
         res = torch.bmm(att, val)
-        res = self.feed_forward(res)
         return res
+    
+class FeedForward(torch.nn.Module):
+   def __init__(self, embedding_dimensions):
+      super(FeedForward, self).__init__()
+      self.feed_forward = torch.nn.Linear(11, embedding_dimensions)
+
+   def forward(self, x):
+      return self.feed_forward(x)
+    
+
+   
