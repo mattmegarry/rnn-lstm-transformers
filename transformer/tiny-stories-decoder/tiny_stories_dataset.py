@@ -8,7 +8,8 @@ def pad(sequences, batch_first=True, padding_value=0.0):
 
 class TinyStoriesDataset(torch.utils.data.Dataset):
   def __init__(self, tokenizer):
-    f = open('TinyStories-1000.txt', 'r')
+    self.data_filename = "TinyStories-1000.txt"
+    f = open(self.data_filename, 'r')
     self.story_lines = f.read().split('\n')
     self.tokenizer = tokenizer
     print("Number of stories: ", len(self.story_lines))
@@ -20,3 +21,6 @@ class TinyStoriesDataset(torch.utils.data.Dataset):
   def __getitem__(self, idx):
     story_line = self.story_lines[idx]
     return torch.tensor(self.tokenizer.encode(story_line))
+  
+  def get_data_filename(self):
+    return self.data_filename
