@@ -72,3 +72,16 @@ generate_from_string("The man")
 generate_from_string("The woman")
 generate_from_string("In the beginning")
 generate_from_string("Once upon a time")
+
+
+""" class AddAndNorm(torch.nn.Module):
+    def __init__(self, embedding_dimensions):
+        super(AddAndNorm, self).__init__()
+        self.norm = torch.nn.LayerNorm(embedding_dimensions)
+
+    def forward(self, residual_x, sublayerOutputNormed):
+        return self.norm(residual_x + sublayerOutputNormed)
+    
+self.residual_dropout = torch.nn.Dropout(0.2) """
+
+# TO DO - what is the 11?
