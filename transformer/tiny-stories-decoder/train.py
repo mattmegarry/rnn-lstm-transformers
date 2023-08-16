@@ -55,14 +55,17 @@ for epoch in range(epochs):
 
 #%%
 def generate_from_string(string):
-      x = torch.cat([sos, torch.tensor(tokenizer.encode(string))])
+      sos = torch.full((1, 1), 1)
+      x = torch.cat([sos, torch.tensor([tokenizer.encode(string)])], dim=1)
       while True:
         p = model(x)
-        p = torch.nn.functional.softmax(p, dim=1)
-        p = torch.argmax(p, dim=1)
-        x = torch.cat([x, p[-1].unsqueeze(0)])
-        if p[-1] == 2 or len(p.tolist()) == 17: break
-      print("Generate:", tokenizer.decode(x.tolist()))
+        p = torch.nn.functional.softmax(p[:, -1, :], dim=1)
+        max_probability_response = torch.argmax(p, dim=1)
+        max_probability_token = int(max_probability_response[0])
+        p = max_probability_response.unsqueeze(0)
+        x = torch.cat((x, p), dim=-1)
+        if max_probability_token == 2 or len(x[0].tolist()) >= max_seq_len: break
+      print("Generate:", tokenizer.decode(x[0].tolist()))
 
 generate_from_string("The man")
 generate_from_string("The woman")
