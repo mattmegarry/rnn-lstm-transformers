@@ -69,6 +69,7 @@ def generate_from_string(string):
         x = torch.cat((x, p), dim=-1)
         if max_probability_token == 2 or len(x[0].tolist()) >= max_seq_len: break
       print("Generate:", tokenizer.decode(x[0].tolist()))
+      print(x[0].tolist())
 
 generate_from_string("The man")
 generate_from_string("The woman")
