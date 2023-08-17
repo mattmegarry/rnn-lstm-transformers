@@ -31,7 +31,7 @@ wandb.init(
 )
 
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, collate_fn=pad)
-model = DecoderModel(max_seq_len, vocab_len, 32)
+model = DecoderModel(max_seq_len, vocab_len, embedding_dimensions=256)
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 #%%
@@ -46,7 +46,7 @@ for epoch in range(epochs):
     y = torch.cat([x[:, 1:], eos], dim=1)
 
     probabilities = model(x)
-    loss = torch.nn.functional.cross_entropy(probabilities.view(-1, vocab_len), y.view(-1))
+    loss = torch.nn.functional.cross_entropy(probabilities.view(-1, vocab_len), y.view(-1), ignore_index=0)
     wandb.log({"loss": loss})
     if idx % 1000 == 0: 
       print("Loss:", loss.item())
@@ -56,6 +56,7 @@ for epoch in range(epochs):
 wandb.finish()
 
 #%%
+print("Running generate...")
 max_seq_len = 20
 def generate_from_string(string):
       sos = torch.full((1, 1), 1)
